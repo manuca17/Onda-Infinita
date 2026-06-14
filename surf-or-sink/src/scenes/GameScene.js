@@ -21,34 +21,13 @@ class GameScene extends Phaser.Scene {
         this.waveLayer  = this.add.tileSprite(W / 2, H / 2, W, H, 'wave').setAlpha(0.9);
 
         // ── Surfer sprite ──────────────────────────────────────────────────────
-        this.surfer = this.physics.add.sprite(120, 200, 'surfer', '0');
+        this.surfer = this.physics.add.sprite(120, 200, 'surfer_idle');
+        this.surfer.setDisplaySize(70, 100);
         this.surfer.setCollideWorldBounds(true);
         this.surfer.setDepth(10);
-        // Custom physics body (smaller than the texture)
-        this.surfer.body.setSize(30, 50);
-        this.surfer.body.setOffset(5, 5);
-
-        // ── Animations ────────────────────────────────────────────────────────
-        if (!this.anims.exists('surf_idle')) {
-            this.anims.create({
-                key: 'surf_idle',
-                frames: [{ key: 'surfer', frame: '0' }],
-                frameRate: 1,
-                repeat: -1
-            });
-        }
-        if (!this.anims.exists('surf_move')) {
-            this.anims.create({
-                key: 'surf_move',
-                frames: [
-                    { key: 'surfer', frame: '0' },
-                    { key: 'surfer', frame: '1' }
-                ],
-                frameRate: 8,
-                repeat: -1
-            });
-        }
-        this.surfer.play('surf_idle');
+        // body.setSize values are in source (pre-scale) coords; texture is 1024x1024
+        this.surfer.body.setSize(660, 870);
+        this.surfer.body.setOffset(180, 77);
 
         // ── Obstacle group ─────────────────────────────────────────────────────
         this.obstacles = this.physics.add.group();
@@ -142,6 +121,9 @@ class GameScene extends Phaser.Scene {
 
         // ── Camera fade in ─────────────────────────────────────────────────────
         this.cameras.main.fadeIn(400, 0, 0, 0);
+
+        this.bgMusic = this.sound.add('bgmusic', { loop: true, volume: 0.5 });
+        this.bgMusic.play();
     }
 
     // ── Spawn scheduling ───────────────────────────────────────────────────────
@@ -162,7 +144,7 @@ class GameScene extends Phaser.Scene {
         const isShark = (this.obstacleCounter % 3 === 2);
         this.obstacleCounter++;
 
-        const key = isShark ? 'shark' : 'rock';
+        const key = isShark ? 'shark_img' : 'rock';
         const y   = Phaser.Math.Between(80, 320);
         const obs = this.obstacles.create(860, y, key);
         obs.setDepth(9);
@@ -170,8 +152,10 @@ class GameScene extends Phaser.Scene {
         obs.setVelocityX(this.obstacleSpeed);
 
         if (isShark) {
-            obs.body.setSize(60, 28);
-            obs.body.setOffset(4, 8);
+            obs.setDisplaySize(110, 65);
+            // body in source coords (1024x1024 texture displayed at 110x65)
+            obs.body.setSize(850, 600);
+            obs.body.setOffset(87, 212);
         } else {
             obs.body.setSize(40, 32);
             obs.body.setOffset(5, 5);
@@ -242,6 +226,7 @@ class GameScene extends Phaser.Scene {
         if (this.gameEnded) return;
         this.gameEnded = true;
 
+        this.bgMusic.stop();
         window.playGameOverSound();
 
         this.surfer.setVelocity(0, 0);
@@ -262,11 +247,13 @@ class GameScene extends Phaser.Scene {
 
         if (this.paused) {
             this.physics.pause();
+            this.bgMusic.pause();
             this.pauseOverlay.setVisible(true);
             this.pauseText.setVisible(true);
             this.resumeText.setVisible(true);
         } else {
             this.physics.resume();
+            this.bgMusic.resume();
             this.pauseOverlay.setVisible(false);
             this.pauseText.setVisible(false);
             this.resumeText.setVisible(false);
@@ -293,20 +280,32 @@ class GameScene extends Phaser.Scene {
 
         if (upPressed) {
             this.surfer.setVelocityY(-220);
-            if (this.surfer.anims.currentAnim?.key !== 'surf_move') {
-                this.surfer.play('surf_move');
+            if (this.surfer.texture.key !== 'surfer_crouch') {
+                this.surfer.setTexture('surfer_crouch');
+                this.surfer.setFlipX(true);
+                this.surfer.setDisplaySize(70, 100);
+                this.surfer.body.setSize(660, 870);
+                this.surfer.body.setOffset(180, 77);
             }
             window.playJumpSound && (this._jumpPlayed ? null : (window.playJumpSound(), this._jumpPlayed = true));
         } else if (downPressed) {
             this.surfer.setVelocityY(220);
-            if (this.surfer.anims.currentAnim?.key !== 'surf_move') {
-                this.surfer.play('surf_move');
+            if (this.surfer.texture.key !== 'surfer_crouch') {
+                this.surfer.setTexture('surfer_crouch');
+                this.surfer.setFlipX(true);
+                this.surfer.setDisplaySize(70, 100);
+                this.surfer.body.setSize(660, 870);
+                this.surfer.body.setOffset(180, 77);
             }
             this._jumpPlayed = false;
         } else {
             this.surfer.setVelocityY(0);
-            if (this.surfer.anims.currentAnim?.key !== 'surf_idle') {
-                this.surfer.play('surf_idle');
+            if (this.surfer.texture.key !== 'surfer_idle') {
+                this.surfer.setTexture('surfer_idle');
+                this.surfer.setFlipX(false);
+                this.surfer.setDisplaySize(70, 100);
+                this.surfer.body.setSize(660, 870);
+                this.surfer.body.setOffset(180, 77);
             }
             this._jumpPlayed = false;
         }
