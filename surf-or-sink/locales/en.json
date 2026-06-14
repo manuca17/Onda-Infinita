@@ -1,0 +1,14 @@
+{
+  "title": "Surf or Sink",
+  "play": "Play",
+  "score": "Score",
+  "lives": "Lives",
+  "gameover": "Game Over",
+  "restart": "Restart (R)",
+  "lang_button": "PT",
+  "instructions": "Use ↑↓ to surf. Dodge rocks and sharks!",
+  "best": "Best",
+  "pause": "PAUSE",
+  "resume": "Resume",
+  "menu": "Menu"
+}
