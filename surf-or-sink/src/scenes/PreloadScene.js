@@ -165,6 +165,159 @@ class PreloadScene extends Phaser.Scene {
         splashGfx.generateTexture('splash', 8, 8);
         splashGfx.destroy();
 
+        // ── Background wave layer (800x400) — softer, for extra parallax depth ──
+        const waveBackGfx = this.make.graphics({ add: false });
+        waveBackGfx.fillStyle(0x1e6aaa, 0); // transparent base
+        for (let wi = 0; wi < 7; wi++) {
+            const wy = 60 + wi * 52;
+            waveBackGfx.lineStyle(6, 0x6fc8ee, 0.22);
+            waveBackGfx.beginPath();
+            for (let x = 0; x <= 800; x += 6) {
+                const yy = wy + Math.sin((x / 800) * Math.PI * 3 + wi * 0.9) * 12;
+                if (x === 0) waveBackGfx.moveTo(x, yy);
+                else waveBackGfx.lineTo(x, yy);
+            }
+            waveBackGfx.strokePath();
+        }
+        waveBackGfx.generateTexture('wave_back', 800, 400);
+        waveBackGfx.destroy();
+
+        // ── Star power-up (28x28) — invincibility ───────────────────────────────
+        const starGfx = this.make.graphics({ add: false });
+        const starPts = [];
+        const cx = 14, cy = 15;
+        for (let s = 0; s < 10; s++) {
+            const r = (s % 2 === 0) ? 13 : 5.5;
+            const ang = -Math.PI / 2 + s * Math.PI / 5;
+            starPts.push({ x: cx + Math.cos(ang) * r, y: cy + Math.sin(ang) * r });
+        }
+        starGfx.fillStyle(0xffd23f);
+        starGfx.fillPoints(starPts, true);
+        starGfx.lineStyle(2, 0xff9900, 1);
+        starGfx.strokePoints(starPts, true);
+        starGfx.fillStyle(0xfff3b0, 0.8);
+        starGfx.fillCircle(11, 11, 3);
+        starGfx.generateTexture('star', 28, 30);
+        starGfx.destroy();
+
+        // ── Turtle power-up (40x30) — slow-motion ──────────────────────────────
+        const turtleGfx = this.make.graphics({ add: false });
+        // Flippers
+        turtleGfx.fillStyle(0x2e8b57);
+        turtleGfx.fillEllipse(9, 9, 12, 8);
+        turtleGfx.fillEllipse(9, 23, 12, 8);
+        turtleGfx.fillEllipse(31, 11, 11, 7);
+        turtleGfx.fillEllipse(31, 21, 11, 7);
+        // Head
+        turtleGfx.fillStyle(0x3aa869);
+        turtleGfx.fillCircle(35, 16, 5);
+        // Shell
+        turtleGfx.fillStyle(0x1f6b41);
+        turtleGfx.fillEllipse(20, 16, 26, 22);
+        turtleGfx.fillStyle(0x2e8b57);
+        turtleGfx.fillEllipse(20, 16, 18, 14);
+        // Shell pattern
+        turtleGfx.lineStyle(1.5, 0x14512f, 1);
+        turtleGfx.strokeEllipse(20, 16, 18, 14);
+        turtleGfx.beginPath();
+        turtleGfx.moveTo(20, 6); turtleGfx.lineTo(20, 26);
+        turtleGfx.moveTo(11, 16); turtleGfx.lineTo(29, 16);
+        turtleGfx.strokePath();
+        // Eye
+        turtleGfx.fillStyle(0x000000);
+        turtleGfx.fillCircle(37, 14, 1.4);
+        turtleGfx.generateTexture('turtle', 42, 32);
+        turtleGfx.destroy();
+
+        // ── Jellyfish obstacle (36x46) — medusa ────────────────────────────────
+        const jellyGfx = this.make.graphics({ add: false });
+        // Dome
+        jellyGfx.fillStyle(0xd96fe0, 0.92);
+        jellyGfx.slice(18, 18, 16, Math.PI, 0, true);
+        jellyGfx.fillPath();
+        jellyGfx.fillStyle(0xe89bf0, 0.9);
+        jellyGfx.slice(18, 18, 16, Math.PI, 0, true);
+        jellyGfx.fillPath();
+        jellyGfx.fillStyle(0xc24fd0, 0.95);
+        jellyGfx.fillRect(2, 17, 32, 4);
+        // Highlight
+        jellyGfx.fillStyle(0xffffff, 0.5);
+        jellyGfx.fillEllipse(13, 11, 7, 5);
+        // Tentacles
+        jellyGfx.lineStyle(2, 0xc24fd0, 0.9);
+        for (let t = 0; t < 5; t++) {
+            const tx = 5 + t * 7;
+            jellyGfx.beginPath();
+            jellyGfx.moveTo(tx, 20);
+            for (let yy = 20; yy <= 44; yy += 4) {
+                const off = Math.sin((yy / 6) + t) * 3;
+                jellyGfx.lineTo(tx + off, yy);
+            }
+            jellyGfx.strokePath();
+        }
+        jellyGfx.generateTexture('jellyfish', 36, 46);
+        jellyGfx.destroy();
+
+        // ── Boat obstacle (90x60) — barco ──────────────────────────────────────
+        const boatGfx = this.make.graphics({ add: false });
+        // Sail
+        boatGfx.fillStyle(0xffffff, 0.95);
+        boatGfx.fillTriangle(45, 4, 45, 38, 14, 38);
+        boatGfx.fillStyle(0xff5566, 0.9);
+        boatGfx.fillTriangle(49, 8, 49, 36, 74, 36);
+        // Mast
+        boatGfx.fillStyle(0x6b4423);
+        boatGfx.fillRect(44, 4, 3, 36);
+        // Hull
+        boatGfx.fillStyle(0x8a4b1f);
+        boatGfx.fillPoints([
+            { x: 6,  y: 40 },
+            { x: 84, y: 40 },
+            { x: 74, y: 56 },
+            { x: 16, y: 56 },
+        ], true);
+        boatGfx.fillStyle(0xb06a30);
+        boatGfx.fillRect(10, 40, 70, 5);
+        boatGfx.generateTexture('boat', 90, 60);
+        boatGfx.destroy();
+
+        // ── Giant wave obstacle (130x300) — onda gigante (forces a jump up) ────
+        const bigWaveGfx = this.make.graphics({ add: false });
+        // Main wave body (tall, occupies lower portion)
+        bigWaveGfx.fillStyle(0x176aa8, 0.96);
+        bigWaveGfx.fillPoints([
+            { x: 0,   y: 90  },
+            { x: 40,  y: 40  },
+            { x: 80,  y: 30  },
+            { x: 110, y: 60  },
+            { x: 130, y: 110 },
+            { x: 130, y: 300 },
+            { x: 0,   y: 300 },
+        ], true);
+        // Curl shadow
+        bigWaveGfx.fillStyle(0x0f4f82, 0.9);
+        bigWaveGfx.slice(78, 70, 36, Math.PI * 1.1, Math.PI * 1.95, false);
+        bigWaveGfx.fillPath();
+        // Foam crest
+        bigWaveGfx.fillStyle(0xffffff, 0.92);
+        bigWaveGfx.fillEllipse(80, 30, 44, 20);
+        bigWaveGfx.fillEllipse(108, 52, 30, 16);
+        bigWaveGfx.fillEllipse(50, 44, 28, 14);
+        // Foam streaks
+        bigWaveGfx.lineStyle(3, 0xbfe6ff, 0.6);
+        for (let wi = 0; wi < 5; wi++) {
+            const wy = 130 + wi * 34;
+            bigWaveGfx.beginPath();
+            for (let x = 6; x <= 124; x += 6) {
+                const yy = wy + Math.sin((x / 18) + wi) * 5;
+                if (x === 6) bigWaveGfx.moveTo(x, yy);
+                else bigWaveGfx.lineTo(x, yy);
+            }
+            bigWaveGfx.strokePath();
+        }
+        bigWaveGfx.generateTexture('bigwave', 130, 300);
+        bigWaveGfx.destroy();
+
         // All done — go to Menu
         loadText.setText('Ready!');
         bar.width = 400;
