@@ -27,7 +27,13 @@ class BootScene extends Phaser.Scene {
                 best: 'Melhor',
                 pause: 'PAUSA',
                 resume: 'Continuar',
-                menu: 'Menu'
+                menu: 'Menu',
+                go: 'JÁ!',
+                tutorial_hint: 'Desvia rochas\ne tubarões!',
+                combo: 'COMBO',
+                pu_life: 'Vida Extra!',
+                pu_shield: 'Invencível!',
+                pu_slow: 'Câmara Lenta!'
             };
             window.locales['en'] = {
                 title: 'Surf or Sink',
@@ -40,8 +46,14 @@ class BootScene extends Phaser.Scene {
                 instructions: 'Use ↑↓ to surf. Dodge rocks and sharks!',
                 best: 'Best',
                 pause: 'PAUSE',
-                resume: 'Resume',
-                menu: 'Menu'
+                resume: 'Continue',
+                menu: 'Menu',
+                go: 'GO!',
+                tutorial_hint: 'Dodge rocks\nand sharks!',
+                combo: 'COMBO',
+                pu_life: 'Extra Life!',
+                pu_shield: 'Invincible!',
+                pu_slow: 'Slow-Mo!'
             };
             this.scene.start('Preload');
         });

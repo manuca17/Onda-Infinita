@@ -26,11 +26,26 @@
 </head>
 <body>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
-    <script src="src/scenes/BootScene.js"></script>
-    <script src="src/scenes/PreloadScene.js"></script>
-    <script src="src/scenes/MenuScene.js"></script>
-    <script src="src/scenes/GameScene.js"></script>
-    <script src="src/scenes/GameOverScene.js"></script>
-    <script src="src/main.js"></script>
+    <!--
+        Carrega os scripts do jogo com cache-busting (?v=timestamp) para garantir
+        que o browser usa sempre a versão mais recente durante o desenvolvimento.
+        Em produção podes substituir Date.now() por um número de versão fixo.
+    -->
+    <script>
+        (function () {
+            var v = Date.now();
+            var files = [
+                'src/scenes/BootScene.js',
+                'src/scenes/PreloadScene.js',
+                'src/scenes/MenuScene.js',
+                'src/scenes/GameScene.js',
+                'src/scenes/GameOverScene.js',
+                'src/main.js'
+            ];
+            files.forEach(function (f) {
+                document.write('<script src="' + f + '?v=' + v + '"><\/script>');
+            });
+        })();
+    </script>
 </body>
 </html>
