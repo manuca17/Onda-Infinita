@@ -3,6 +3,14 @@ class PreloadScene extends Phaser.Scene {
         super({ key: 'Preload' });
     }
 
+    preload() {
+        this.load.image('surfer_idle',   'assets/surfer1.png');
+        this.load.image('surfer_crouch', 'assets/surfer2.png');
+        this.load.image('shark_img',     'assets/shark.png');
+        this.load.audio('bgmusic',   'assets/Sonic The Hedgehog OST - Green Hill Zone.mp3');
+        this.load.audio('drowning', 'assets/Sonic 1 Music_ Drowning.mp3');
+    }
+
     create() {
         const W = 800;
         const H = 400;
@@ -17,7 +25,7 @@ class PreloadScene extends Phaser.Scene {
             fontFamily: 'Arial'
         }).setOrigin(0.5);
 
-        const steps = 7;
+        const steps = 5;
         let step = 0;
         const advance = () => {
             step++;
@@ -94,69 +102,6 @@ class PreloadScene extends Phaser.Scene {
         waveGfx.destroy();
         advance();
 
-        // ── Surfer spritesheet (80x60, 2 frames of 40x60) ─────────────────────
-        const surferGfx = this.make.graphics({ add: false });
-
-        // Frame 0: normal upright pose at x=0
-        // Board (white)
-        surferGfx.fillStyle(0xffffff);
-        surferGfx.fillRect(2, 50, 36, 8);
-        // Body (wetsuit dark blue)
-        surferGfx.fillStyle(0x1a2a6e);
-        surferGfx.fillRect(12, 22, 16, 28);
-        // Arms
-        surferGfx.fillStyle(0x1a2a6e);
-        surferGfx.fillRect(4, 26, 10, 6);  // left arm
-        surferGfx.fillRect(26, 24, 10, 6); // right arm raised
-        // Legs
-        surferGfx.fillStyle(0x0f1a4e);
-        surferGfx.fillRect(12, 42, 6, 10);
-        surferGfx.fillRect(22, 42, 6, 10);
-        // Head (skin tone)
-        surferGfx.fillStyle(0xffcc88);
-        surferGfx.fillCircle(20, 14, 10);
-        // Hair
-        surferGfx.fillStyle(0x5c3317);
-        surferGfx.fillRect(10, 6, 20, 7);
-        surferGfx.fillCircle(20, 7, 8);
-        // Board stripe
-        surferGfx.fillStyle(0xff4444);
-        surferGfx.fillRect(10, 50, 20, 3);
-
-        // Frame 1: crouched/leaning at x=40
-        // Board (white) - slightly angled look
-        surferGfx.fillStyle(0xffffff);
-        surferGfx.fillRect(42, 52, 36, 7);
-        // Body crouched
-        surferGfx.fillStyle(0x1a2a6e);
-        surferGfx.fillRect(50, 26, 16, 24);
-        // Arms spread for balance
-        surferGfx.fillStyle(0x1a2a6e);
-        surferGfx.fillRect(42, 28, 10, 5);  // left arm out
-        surferGfx.fillRect(68, 22, 10, 5);  // right arm up
-        // Legs bent
-        surferGfx.fillStyle(0x0f1a4e);
-        surferGfx.fillRect(50, 44, 6, 8);
-        surferGfx.fillRect(60, 46, 6, 8);
-        // Head leaning
-        surferGfx.fillStyle(0xffcc88);
-        surferGfx.fillCircle(59, 17, 10);
-        // Hair
-        surferGfx.fillStyle(0x5c3317);
-        surferGfx.fillRect(49, 9, 20, 7);
-        surferGfx.fillCircle(59, 10, 8);
-        // Board stripe
-        surferGfx.fillStyle(0xff4444);
-        surferGfx.fillRect(50, 52, 20, 3);
-
-        surferGfx.generateTexture('surfer', 80, 60);
-        surferGfx.destroy();
-
-        // Register frames on the spritesheet texture
-        const surferTex = this.textures.get('surfer');
-        surferTex.add('0', 0, 0, 0, 40, 60);
-        surferTex.add('1', 0, 40, 0, 40, 60);
-        advance();
 
         // ── Rock texture (50x40) ────────────────────────────────────────────────
         const rockGfx = this.make.graphics({ add: false });
@@ -192,41 +137,6 @@ class PreloadScene extends Phaser.Scene {
         rockGfx.destroy();
         advance();
 
-        // ── Shark texture (70x40) ───────────────────────────────────────────────
-        const sharkGfx = this.make.graphics({ add: false });
-        // Body (blue-grey oval)
-        sharkGfx.fillStyle(0x6688aa);
-        sharkGfx.fillEllipse(35, 26, 65, 22);
-        // Lighter belly
-        sharkGfx.fillStyle(0xddeeee);
-        sharkGfx.fillEllipse(32, 30, 50, 10);
-        // Dorsal fin
-        sharkGfx.fillStyle(0x556688);
-        sharkGfx.fillTriangle(28, 25, 38, 2, 46, 25);
-        // Tail fin
-        sharkGfx.fillStyle(0x556688);
-        sharkGfx.fillTriangle(2, 18, 2, 34, 14, 26);
-        // Pectoral fin
-        sharkGfx.fillStyle(0x6688aa);
-        sharkGfx.fillTriangle(38, 28, 52, 38, 52, 26);
-        // Eye
-        sharkGfx.fillStyle(0x000000);
-        sharkGfx.fillCircle(58, 24, 3);
-        sharkGfx.fillStyle(0xffffff);
-        sharkGfx.fillCircle(59, 23, 1);
-        // Mouth
-        sharkGfx.lineStyle(1, 0xffffff, 0.8);
-        sharkGfx.beginPath();
-        sharkGfx.moveTo(62, 27);
-        sharkGfx.lineTo(68, 26);
-        sharkGfx.strokePath();
-        // Teeth
-        sharkGfx.fillStyle(0xffffff);
-        sharkGfx.fillTriangle(63, 27, 65, 27, 64, 30);
-        sharkGfx.fillTriangle(66, 27, 68, 27, 67, 30);
-        sharkGfx.generateTexture('shark', 70, 40);
-        sharkGfx.destroy();
-        advance();
 
         // ── Heart texture (24x24) ───────────────────────────────────────────────
         const heartGfx = this.make.graphics({ add: false });

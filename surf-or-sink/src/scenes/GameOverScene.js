@@ -143,9 +143,14 @@ class GameOverScene extends Phaser.Scene {
 
         // ── Camera fade in ─────────────────────────────────────────────────────
         this.cameras.main.fadeIn(500, 0, 0, 0);
+
+        this.bgMusic = this.sound.add('drowning', { loop: false, volume: 0.8 });
+        const offset = Math.max(0, this.bgMusic.duration - 3);
+        this.bgMusic.play({ seek: offset });
     }
 
     restartGame() {
+        this.bgMusic.stop();
         this.cameras.main.fadeOut(400, 0, 0, 0);
         this.cameras.main.once('camerafadeoutcomplete', () => {
             this.scene.start('Game');
@@ -153,6 +158,7 @@ class GameOverScene extends Phaser.Scene {
     }
 
     goMenu() {
+        this.bgMusic.stop();
         this.cameras.main.fadeOut(400, 0, 0, 0);
         this.cameras.main.once('camerafadeoutcomplete', () => {
             this.scene.start('Menu');
