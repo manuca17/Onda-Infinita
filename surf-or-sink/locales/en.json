@@ -18,5 +18,14 @@
   "pu_shield": "Invincible!",
   "pu_slow": "Slow-Mo!",
   "faster": "FASTER!",
-  "coin": "+Coin!"
+  "coin": "+Coin!",
+  "enter_name": "Your name...",
+  "save_score": "Save",
+  "saved_ok": "✓ Saved to leaderboard!",
+  "saved_err": "Error saving score.",
+  "leaderboard": "🏆 Ranking",
+  "lb_title": "🏆 TOP 10",
+  "lb_empty": "No scores yet!",
+  "lb_loading": "Loading...",
+  "lb_close": "Close"
 }
