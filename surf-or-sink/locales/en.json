@@ -16,5 +16,7 @@
   "combo": "COMBO",
   "pu_life": "Extra Life!",
   "pu_shield": "Invincible!",
-  "pu_slow": "Slow-Mo!"
+  "pu_slow": "Slow-Mo!",
+  "faster": "FASTER!",
+  "coin": "+Coin!"
 }

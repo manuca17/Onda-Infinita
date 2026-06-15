@@ -86,6 +86,9 @@ class MenuScene extends Phaser.Scene {
             this.refreshTexts();
         });
 
+        // ── Volume control ─────────────────────────────────────────────────────
+        this._buildVolumeControl(W);
+
         // ── Animated tutorial panel ────────────────────────────────────────────
         this._buildTutorial(W);
 
@@ -94,6 +97,45 @@ class MenuScene extends Phaser.Scene {
 
         // ── Camera fade in ─────────────────────────────────────────────────────
         this.cameras.main.fadeIn(500, 0, 0, 0);
+    }
+
+    // ── Volume control row ─────────────────────────────────────────────────────
+    _buildVolumeControl(W) {
+        const y = 252;
+
+        this.add.text(W / 2 - 72, y, '♪', {
+            fontSize: '18px', fontFamily: 'Arial', fill: '#aaddff',
+            stroke: '#002244', strokeThickness: 2
+        }).setOrigin(0.5);
+
+        const minusBtn = this.add.text(W / 2 - 38, y, '−', {
+            fontSize: '26px', fontFamily: 'Arial Black, Arial', fill: '#ffffff',
+            stroke: '#002244', strokeThickness: 3
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+
+        this.volumeText = this.add.text(W / 2, y, Math.round(window.musicVolume * 100) + '%', {
+            fontSize: '17px', fontFamily: 'Arial', fill: '#ffe44d',
+            stroke: '#002244', strokeThickness: 3
+        }).setOrigin(0.5);
+
+        const plusBtn = this.add.text(W / 2 + 42, y, '+', {
+            fontSize: '26px', fontFamily: 'Arial Black, Arial', fill: '#ffffff',
+            stroke: '#002244', strokeThickness: 3
+        }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+
+        const changeVol = (delta) => {
+            window.musicVolume = Math.min(1, Math.max(0, Math.round((window.musicVolume + delta) * 10) / 10));
+            localStorage.setItem('surforsink_volume', window.musicVolume);
+            this.volumeText.setText(Math.round(window.musicVolume * 100) + '%');
+        };
+
+        minusBtn.on('pointerover', () => minusBtn.setColor('#ffe44d'));
+        minusBtn.on('pointerout',  () => minusBtn.setColor('#ffffff'));
+        minusBtn.on('pointerdown', () => changeVol(-0.1));
+
+        plusBtn.on('pointerover', () => plusBtn.setColor('#ffe44d'));
+        plusBtn.on('pointerout',  () => plusBtn.setColor('#ffffff'));
+        plusBtn.on('pointerdown', () => changeVol(0.1));
     }
 
     // ── Animated tutorial ──────────────────────────────────────────────────────

@@ -28,6 +28,9 @@ class GameScene extends Phaser.Scene {
         this.comboTime     = 0;
         this.multiplier    = 1;
 
+        // Day/night cycle & milestones
+        this.milestones    = new Set();
+
         // ── Parallax background layers (2 wave layers for depth) ───────────────
         this.skyLayer      = this.add.tileSprite(W / 2, H / 2, W, H, 'sky');
         this.oceanLayer    = this.add.tileSprite(W / 2, H / 2, W, H, 'ocean').setAlpha(0.85);
@@ -45,11 +48,13 @@ class GameScene extends Phaser.Scene {
         // ── Groups ─────────────────────────────────────────────────────────────
         this.obstacles       = this.physics.add.group();
         this.powerups        = this.physics.add.group();
+        this.coins           = this.physics.add.group();
         this.obstacleCounter = 0;
 
         // ── Overlaps ───────────────────────────────────────────────────────────
         this.physics.add.overlap(this.surfer, this.obstacles, this.hitObstacle,   null, this);
         this.physics.add.overlap(this.surfer, this.powerups,  this.collectPowerup, null, this);
+        this.physics.add.overlap(this.surfer, this.coins,     this.collectCoin,    null, this);
 
         // ── HUD ───────────────────────────────────────────────────────────────
         this.scoreText = this.add.text(16, 16, window.t('score') + ': 0', {
@@ -156,7 +161,7 @@ class GameScene extends Phaser.Scene {
         // ── Camera fade in ─────────────────────────────────────────────────────
         this.cameras.main.fadeIn(400, 0, 0, 0);
 
-        this.bgMusic = this.sound.add('bgmusic', { loop: true, volume: 0.5 });
+        this.bgMusic = this.sound.add('bgmusic', { loop: true, volume: window.musicVolume });
         this.bgMusic.play();
 
         // ── Initial countdown before gameplay begins ───────────────────────────
@@ -178,6 +183,12 @@ class GameScene extends Phaser.Scene {
             delay: Phaser.Math.Between(6000, 9000),
             loop: false,
             callback: this.scheduleNextPowerup,
+            callbackScope: this
+        });
+        this.coinEvent = this.time.addEvent({
+            delay: Phaser.Math.Between(2000, 4000),
+            loop: false,
+            callback: this.scheduleNextCoin,
             callbackScope: this
         });
     }
@@ -274,6 +285,18 @@ class GameScene extends Phaser.Scene {
             obs.body.setSize(72, 34);
             obs.body.setOffset(9, 22);
             obs.setVelocityX(speed * 0.9);
+        } else if (type === 'jumpshark') {
+            const startX = Phaser.Math.Between(380, 680);
+            obs = this.obstacles.create(startX, 440, 'shark_img');
+            obs.setDepth(9);
+            obs.setDisplaySize(110, 65);
+            obs.body.setSize(850, 600);
+            obs.body.setOffset(87, 212);
+            obs.body.allowGravity = true;
+            obs.body.setGravityY(520);
+            obs.setVelocityX(speed * 0.25);
+            obs.setVelocityY(-530);
+            obs.setFlipY(true);
         } else {
             // rock
             obs = this.obstacles.create(860, Phaser.Math.Between(80, 320), 'rock');
@@ -291,11 +314,12 @@ class GameScene extends Phaser.Scene {
     pickObstacleType() {
         this.obstacleCounter++;
         const table = [
-            { type: 'rock',      w: 34 },
-            { type: 'shark',     w: 24 },
-            { type: 'jellyfish', w: 18 },
-            { type: 'boat',      w: 13 },
-            { type: 'bigwave',   w: 11 }
+            { type: 'rock',      w: 30 },
+            { type: 'shark',     w: 22 },
+            { type: 'jellyfish', w: 16 },
+            { type: 'boat',      w: 12 },
+            { type: 'bigwave',   w: 10 },
+            { type: 'jumpshark', w: 10 }
         ];
         const total = table.reduce((s, e) => s + e.w, 0);
         let r = Math.random() * total;
@@ -437,6 +461,7 @@ class GameScene extends Phaser.Scene {
         const ratio = f / this.slowFactor;
         this.obstacles.getChildren().forEach(o => { if (o.body) o.body.velocity.x *= ratio; });
         this.powerups.getChildren().forEach(p => { if (p.body) p.body.velocity.x *= ratio; });
+        this.coins.getChildren().forEach(c => { if (c.body) c.body.velocity.x *= ratio; });
         this.slowFactor = f;
     }
 
@@ -503,6 +528,7 @@ class GameScene extends Phaser.Scene {
 
         if (this.spawnEvent)   this.spawnEvent.remove(false);
         if (this.powerupEvent) this.powerupEvent.remove(false);
+        if (this.coinEvent)    this.coinEvent.remove(false);
 
         this.bgMusic.stop();
         window.playGameOverSound();
@@ -513,6 +539,7 @@ class GameScene extends Phaser.Scene {
         this.surfer.setTint(0xff5555);
         this.obstacles.getChildren().forEach(o => { if (o.body) o.setVelocityX(0); });
         this.powerups.getChildren().forEach(p => { if (p.body) p.setVelocityX(0); });
+        this.coins.getChildren().forEach(c => { if (c.body) c.setVelocityX(0); });
 
         this.splashParticles.emitParticleAt(this.surfer.x, this.surfer.y, 16);
 
@@ -579,6 +606,108 @@ class GameScene extends Phaser.Scene {
         });
     }
 
+    // ── Coin spawning ──────────────────────────────────────────────────────────
+    scheduleNextCoin() {
+        if (this.gameEnded) return;
+        this.spawnCoin();
+        this.coinEvent = this.time.addEvent({
+            delay: Phaser.Math.Between(2000, 4000),
+            loop: false,
+            callback: this.scheduleNextCoin,
+            callbackScope: this
+        });
+    }
+
+    spawnCoin() {
+        if (this.gameEnded) return;
+        const y = Phaser.Math.Between(80, 340);
+        const coin = this.coins.create(870, y, 'coin');
+        coin.setDepth(9);
+        coin.body.allowGravity = false;
+        coin.setDisplaySize(22, 22);
+        coin.setVelocityX(this.obstacleSpeed * 0.75 * this.slowFactor);
+        coin.setData('baseY', y);
+        coin.setData('phase', Math.random() * Math.PI * 2);
+        this.tweens.add({
+            targets: coin, scaleX: 0.15, duration: 350,
+            yoyo: true, repeat: -1, ease: 'Sine.easeInOut'
+        });
+    }
+
+    collectCoin(surfer, coin) {
+        if (this.gameEnded) return;
+        coin.destroy();
+        const bonus = 15 * this.multiplier;
+        this.score += bonus;
+        this.splashParticles.emitParticleAt(surfer.x, surfer.y, 5);
+        this.floatText('+' + bonus, '#ffd700');
+        window.playJumpSound && window.playJumpSound();
+    }
+
+    // ── Day/night cycle ────────────────────────────────────────────────────────
+    lerpColor(c1, c2, t) {
+        t = Math.max(0, Math.min(1, t));
+        const r1=(c1>>16)&0xff, g1=(c1>>8)&0xff, b1=c1&0xff;
+        const r2=(c2>>16)&0xff, g2=(c2>>8)&0xff, b2=c2&0xff;
+        return (Math.round(r1+(r2-r1)*t)<<16)|(Math.round(g1+(g2-g1)*t)<<8)|Math.round(b1+(b2-b1)*t);
+    }
+
+    updateDayNight() {
+        let skyTint, seaTint;
+        if (this.score < 200) {
+            skyTint = 0xffffff;
+            seaTint = 0xffffff;
+        } else if (this.score < 500) {
+            const t = (this.score - 200) / 300;
+            skyTint = this.lerpColor(0xffffff, 0xff8844, t);
+            seaTint = this.lerpColor(0xffffff, 0xff6633, t);
+        } else {
+            const t = Math.min((this.score - 500) / 300, 1);
+            skyTint = this.lerpColor(0xff8844, 0x334488, t);
+            seaTint = this.lerpColor(0xff6633, 0x112255, t);
+        }
+        this.skyLayer.setTint(skyTint);
+        this.oceanLayer.setTint(seaTint);
+        this.waveBackLayer.setTint(skyTint);
+        this.waveLayer.setTint(seaTint);
+    }
+
+    // ── Speed milestones ───────────────────────────────────────────────────────
+    checkMilestones() {
+        for (const threshold of [200, 500, 1000]) {
+            if (this.score >= threshold && !this.milestones.has(threshold)) {
+                this.milestones.add(threshold);
+                this.triggerMilestone();
+            }
+        }
+    }
+
+    triggerMilestone() {
+        this.cameras.main.flash(350, 255, 200, 80);
+        const W = 800, H = 400;
+        const msg = this.add.text(W / 2, H / 2, window.t('faster'), {
+            fontSize: '54px',
+            fontFamily: 'Arial Black, Arial',
+            fontStyle: 'bold',
+            fill: '#ff4400',
+            stroke: '#ffffff',
+            strokeThickness: 7,
+            shadow: { offsetX: 3, offsetY: 3, color: '#000', blur: 10, fill: true }
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(45).setScale(0.2).setAlpha(0);
+
+        this.tweens.add({
+            targets: msg, scaleX: 1, scaleY: 1, alpha: 1,
+            duration: 280, ease: 'Back.easeOut',
+            onComplete: () => {
+                this.tweens.add({
+                    targets: msg, alpha: 0, y: H / 2 - 70,
+                    duration: 600, delay: 500, ease: 'Power2',
+                    onComplete: () => msg.destroy()
+                });
+            }
+        });
+    }
+
     // ── Update loop ────────────────────────────────────────────────────────────
     update(time, delta) {
         if (!this.countingDown && !this.gameEnded) {
@@ -590,16 +719,17 @@ class GameScene extends Phaser.Scene {
 
         if (this.paused || this.gameEnded || this.countingDown) return;
 
-        // ── Progressive difficulty: gradual, continuous speed ramp ──────────────
+        // ── Progressive difficulty: speed scales with score ────────────────────
         this.elapsedSec += delta / 1000;
-        this.obstacleSpeed = this.baseSpeed - Math.min(this.elapsedSec * 6, 360);
+        this.obstacleSpeed = this.baseSpeed - Math.min(this.score * 0.5, 400);
 
-        // ── Parallax scrolling (scaled by slow-mo) ──────────────────────────────
+        // ── Parallax scrolling (scaled by slow-mo and current speed) ───────────
         const s = this.slowFactor;
-        this.skyLayer.tilePositionX      += 0.5 * s;
-        this.oceanLayer.tilePositionX    += 1.5 * s;
-        this.waveBackLayer.tilePositionX += 1.2 * s;
-        this.waveLayer.tilePositionX     += 3.0 * s;
+        const speedRatio = Math.abs(this.obstacleSpeed) / Math.abs(this.baseSpeed);
+        this.skyLayer.tilePositionX      += 0.5 * s * speedRatio;
+        this.oceanLayer.tilePositionX    += 1.5 * s * speedRatio;
+        this.waveBackLayer.tilePositionX += 1.2 * s * speedRatio;
+        this.waveLayer.tilePositionX     += 3.0 * s * speedRatio;
 
         // ── Surfer movement ─────────────────────────────────────────────────────
         const upPressed   = this.cursors.up.isDown   || this.wasd.up.isDown;
@@ -657,16 +787,24 @@ class GameScene extends Phaser.Scene {
         this.score += (delta / 100) * this.multiplier;
         this.scoreText.setText(window.t('score') + ': ' + Math.floor(this.score));
 
+        // ── Day/night & milestones ─────────────────────────────────────────────
+        this.updateDayNight();
+        this.checkMilestones();
+
         // ── Jellyfish bobbing & off-screen cleanup ──────────────────────────────
         this.obstacles.getChildren().forEach(obs => {
             if (obs.getData('bob')) {
                 obs.y = obs.getData('baseY') + Math.sin(time * 0.004 + obs.getData('phase')) * 16;
             }
-            if (obs.x < -150) obs.destroy();
+            if (obs.x < -150 || obs.y > 460) obs.destroy();
         });
         this.powerups.getChildren().forEach(pu => {
             pu.y = pu.getData('baseY') + Math.sin(time * 0.003 + pu.getData('phase')) * 12;
             if (pu.x < -80) pu.destroy();
+        });
+        this.coins.getChildren().forEach(coin => {
+            coin.y = coin.getData('baseY') + Math.sin(time * 0.004 + coin.getData('phase')) * 10;
+            if (coin.x < -80) coin.destroy();
         });
     }
 }
