@@ -90,6 +90,9 @@ class GameOverScene extends Phaser.Scene {
             });
         }
 
+        // ── Name input & submit ────────────────────────────────────────────────
+        this._buildNameInput(finalScore);
+
         // ── Restart button ─────────────────────────────────────────────────────
         const restartBg = this.add.rectangle(W / 2 - 115, 285, 200, 50, 0x22cc55)
             .setStrokeStyle(3, 0x009933)
@@ -147,6 +150,67 @@ class GameOverScene extends Phaser.Scene {
         this.bgMusic = this.sound.add('drowning', { loop: false, volume: 0.8 });
         const offset = Math.max(0, this.bgMusic.duration - 3);
         this.bgMusic.play({ seek: offset });
+    }
+
+    _buildNameInput(score) {
+        const canvas = document.querySelector('canvas');
+
+        const wrap = document.createElement('div');
+        wrap.id = 'lb-name-wrap';
+        wrap.style.cssText = `
+            position: fixed; z-index: 999;
+            display: flex; align-items: center; gap: 6px;
+            font-family: Arial, sans-serif;
+        `;
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.maxLength = 20;
+        input.placeholder = window.t('enter_name');
+        input.style.cssText = `
+            padding: 6px 10px; border-radius: 6px; border: 2px solid #4aaad4;
+            background: #0d2a4a; color: #fff; font-size: 14px; width: 150px; outline: none;
+        `;
+
+        const btn = document.createElement('button');
+        btn.textContent = window.t('save_score');
+        btn.style.cssText = `
+            padding: 6px 14px; border-radius: 6px; border: none; cursor: pointer;
+            background: #e6a817; color: #fff; font-weight: bold; font-size: 14px;
+        `;
+
+        wrap.appendChild(input);
+        wrap.appendChild(btn);
+        document.body.appendChild(wrap);
+
+        const reposition = () => {
+            const r = canvas.getBoundingClientRect();
+            wrap.style.left = (r.left + r.width / 2 - 90) + 'px';
+            wrap.style.top  = (r.top  + r.height * 0.84) + 'px';
+        };
+        reposition();
+        window.addEventListener('resize', reposition);
+
+        btn.addEventListener('click', async () => {
+            const name = input.value.trim() || 'Anónimo';
+            btn.disabled = true;
+            btn.textContent = '...';
+            const ok = await window.submitScore(name, score);
+            wrap.remove();
+            window.removeEventListener('resize', reposition);
+            const W = 800, H = 400;
+            this.add.text(W / 2, H * 0.88, ok ? window.t('saved_ok') : window.t('saved_err'), {
+                fontSize: '16px', fontFamily: 'Arial', fill: ok ? '#44ff99' : '#ff4455',
+                stroke: '#002244', strokeThickness: 3
+            }).setOrigin(0.5).setDepth(20);
+        });
+
+        const cleanup = () => {
+            wrap.remove();
+            window.removeEventListener('resize', reposition);
+        };
+        this.events.once('shutdown', cleanup);
+        this.events.once('destroy',  cleanup);
     }
 
     restartGame() {

@@ -5,9 +5,10 @@ class BootScene extends Phaser.Scene {
 
     create() {
         // Load both locale JSON files, store in window.locales, then start Preload
+        const v = Date.now();
         Promise.all([
-            fetch('./locales/pt.json').then(r => r.json()),
-            fetch('./locales/en.json').then(r => r.json())
+            fetch('./locales/pt.json?v=' + v).then(r => r.json()),
+            fetch('./locales/en.json?v=' + v).then(r => r.json())
         ]).then(([ptData, enData]) => {
             window.locales['pt'] = ptData;
             window.locales['en'] = enData;
@@ -31,29 +32,25 @@ class BootScene extends Phaser.Scene {
                 go: 'JÁ!',
                 tutorial_hint: 'Desvia rochas\ne tubarões!',
                 combo: 'COMBO',
-                pu_life: 'Vida Extra!',
-                pu_shield: 'Invencível!',
-                pu_slow: 'Câmara Lenta!'
+                pu_life: 'Vida Extra!', pu_shield: 'Invencível!', pu_slow: 'Câmara Lenta!',
+                faster: 'MAIS RÁPIDO!', coin: '+Moeda!',
+                enter_name: 'O teu nome...', save_score: 'Guardar',
+                saved_ok: '✓ Guardado no ranking!', saved_err: 'Erro ao guardar.',
+                leaderboard: '🏆 Ranking', lb_title: '🏆 TOP 10',
+                lb_empty: 'Sem pontuações ainda!', lb_loading: 'A carregar...', lb_close: 'Fechar'
             };
             window.locales['en'] = {
-                title: 'Surf or Sink',
-                play: 'Play',
-                score: 'Score',
-                lives: 'Lives',
-                gameover: 'Game Over',
-                restart: 'Restart (R)',
-                lang_button: 'PT',
+                title: 'Surf or Sink', play: 'Play', score: 'Score', lives: 'Lives',
+                gameover: 'Game Over', restart: 'Restart (R)', lang_button: 'PT',
                 instructions: 'Use ↑↓ to surf. Dodge rocks and sharks!',
-                best: 'Best',
-                pause: 'PAUSE',
-                resume: 'Continue',
-                menu: 'Menu',
-                go: 'GO!',
-                tutorial_hint: 'Dodge rocks\nand sharks!',
-                combo: 'COMBO',
-                pu_life: 'Extra Life!',
-                pu_shield: 'Invincible!',
-                pu_slow: 'Slow-Mo!'
+                best: 'Best', pause: 'PAUSE', resume: 'Continue', menu: 'Menu', go: 'GO!',
+                tutorial_hint: 'Dodge rocks\nand sharks!', combo: 'COMBO',
+                pu_life: 'Extra Life!', pu_shield: 'Invincible!', pu_slow: 'Slow-Mo!',
+                faster: 'FASTER!', coin: '+Coin!',
+                enter_name: 'Your name...', save_score: 'Save',
+                saved_ok: '✓ Saved to leaderboard!', saved_err: 'Error saving score.',
+                leaderboard: '🏆 Ranking', lb_title: '🏆 TOP 10',
+                lb_empty: 'No scores yet!', lb_loading: 'Loading...', lb_close: 'Close'
             };
             this.scene.start('Preload');
         });

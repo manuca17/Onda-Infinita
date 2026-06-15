@@ -18,5 +18,14 @@
   "pu_shield": "Invencível!",
   "pu_slow": "Câmara Lenta!",
   "faster": "MAIS RÁPIDO!",
-  "coin": "+Moeda!"
+  "coin": "+Moeda!",
+  "enter_name": "O teu nome...",
+  "save_score": "Guardar",
+  "saved_ok": "✓ Guardado no ranking!",
+  "saved_err": "Erro ao guardar.",
+  "leaderboard": "🏆 Ranking",
+  "lb_title": "🏆 TOP 10",
+  "lb_empty": "Sem pontuações ainda!",
+  "lb_loading": "A carregar...",
+  "lb_close": "Fechar"
 }

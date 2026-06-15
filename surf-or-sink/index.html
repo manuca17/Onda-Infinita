@@ -26,15 +26,13 @@
 </head>
 <body>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
-    <!--
-        Carrega os scripts do jogo com cache-busting (?v=timestamp) para garantir
-        que o browser usa sempre a versão mais recente durante o desenvolvimento.
-        Em produção podes substituir Date.now() por um número de versão fixo.
-    -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
     <script>
         (function () {
             var v = Date.now();
             var files = [
+                'src/firebase.js',
                 'src/scenes/BootScene.js',
                 'src/scenes/PreloadScene.js',
                 'src/scenes/MenuScene.js',

@@ -67,6 +67,24 @@ class MenuScene extends Phaser.Scene {
         });
         this.playBtnBg.on('pointerdown', () => this.startGame());
 
+        // ── Leaderboard button ─────────────────────────────────────────────────
+        this.lbBtnBg = this.add.rectangle(W / 2, 372, 140, 30, 0xb8860b, 1)
+            .setStrokeStyle(2, 0x7a5800)
+            .setInteractive({ useHandCursor: true });
+
+        this.lbBtnText = this.add.text(W / 2, 372, window.t('leaderboard'), {
+            fontSize: '14px',
+            fontFamily: 'Arial Black, Arial',
+            fontStyle: 'bold',
+            fill: '#ffffff',
+            stroke: '#5a3800',
+            strokeThickness: 2
+        }).setOrigin(0.5);
+
+        this.lbBtnBg.on('pointerover', () => this.lbBtnBg.setFillStyle(0xd4a020));
+        this.lbBtnBg.on('pointerout',  () => this.lbBtnBg.setFillStyle(0xb8860b));
+        this.lbBtnBg.on('pointerdown', () => this._showLeaderboard());
+
         // ── Language toggle button ─────────────────────────────────────────────
         this.langBtnBg = this.add.rectangle(W - 50, 20, 60, 30, 0xffffff, 0.9)
             .setStrokeStyle(2, 0x003366)
@@ -259,6 +277,74 @@ class MenuScene extends Phaser.Scene {
                 });
             }
         });
+    }
+
+    _showLeaderboard() {
+        const canvas = document.querySelector('canvas');
+        const r = canvas.getBoundingClientRect();
+
+        const panel = document.createElement('div');
+        panel.style.cssText = `
+            position: fixed;
+            left: ${r.left}px; top: ${r.top}px;
+            width: ${r.width}px; height: ${r.height}px;
+            background: rgba(4, 16, 40, 0.97);
+            color: #fff; font-family: Arial, sans-serif;
+            z-index: 1000; display: flex; flex-direction: column;
+            align-items: center; padding: 22px 30px; box-sizing: border-box;
+        `;
+
+        panel.innerHTML = `
+            <div style="font-size: 22px; font-weight: bold; color: #ffe44d; margin-bottom: 14px;">
+                ${window.t('lb_title')}
+            </div>
+            <div id="lb-rows" style="width: 100%; flex: 1; font-size: 15px; color: #aaddff;">
+                ${window.t('lb_loading')}
+            </div>
+            <button id="lb-close-btn" style="
+                margin-top: 14px; padding: 8px 28px; background: #2255aa;
+                color: #fff; border: none; border-radius: 8px;
+                cursor: pointer; font-size: 15px; font-weight: bold;
+            ">${window.t('lb_close')}</button>
+        `;
+
+        document.body.appendChild(panel);
+
+        const medals = ['🥇', '🥈', '🥉'];
+
+        window.getLeaderboard().then(scores => {
+            const el = document.getElementById('lb-rows');
+            if (!el) return;
+            if (scores.length === 0) {
+                el.innerHTML = `<p style="text-align:center;margin-top:20px">${window.t('lb_empty')}</p>`;
+                return;
+            }
+            el.innerHTML = scores.map((s, i) => `
+                <div style="
+                    display: flex; justify-content: space-between; align-items: center;
+                    padding: 7px 14px; margin-bottom: 4px; border-radius: 6px;
+                    background: ${i % 2 === 0 ? 'rgba(255,255,255,0.06)' : 'transparent'};
+                ">
+                    <span style="color:${i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'#aaddff'}">
+                        ${medals[i] || '#' + (i + 1)}&nbsp;&nbsp;${s.name}
+                    </span>
+                    <span style="font-weight:bold;color:#fff">${s.score}</span>
+                </div>
+            `).join('');
+        });
+
+        this.input.enabled = false;
+
+        const close = () => {
+            panel.remove();
+            this.input.enabled = true;
+        };
+
+        document.getElementById('lb-close-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            close();
+        });
+        this.events.once('shutdown', close);
     }
 
     refreshTexts() {
