@@ -1,3 +1,6 @@
+// Global music volume (persisted)
+window.musicVolume = parseFloat(localStorage.getItem('surforsink_volume') ?? '0.5');
+
 // Global language and translation system
 window.currentLang = 'pt';
 window.locales = {};

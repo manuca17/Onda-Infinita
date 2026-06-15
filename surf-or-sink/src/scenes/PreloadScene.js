@@ -318,6 +318,21 @@ class PreloadScene extends Phaser.Scene {
         bigWaveGfx.generateTexture('bigwave', 130, 300);
         bigWaveGfx.destroy();
 
+        // ── Coin collectible (24x24) ──────────────────────────────────────────────
+        const coinGfx = this.make.graphics({ add: false });
+        coinGfx.fillStyle(0xb8860b);
+        coinGfx.fillCircle(12, 12, 11);
+        coinGfx.fillStyle(0xffd700);
+        coinGfx.fillCircle(12, 12, 9);
+        coinGfx.fillStyle(0xffe566);
+        coinGfx.fillCircle(12, 12, 6);
+        coinGfx.lineStyle(1.5, 0xb8860b, 1);
+        coinGfx.strokeCircle(12, 12, 9);
+        coinGfx.fillStyle(0xffffff, 0.75);
+        coinGfx.fillEllipse(8, 8, 5, 3);
+        coinGfx.generateTexture('coin', 24, 24);
+        coinGfx.destroy();
+
         // All done — go to Menu
         loadText.setText('Ready!');
         bar.width = 400;
