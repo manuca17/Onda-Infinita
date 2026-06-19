@@ -4,7 +4,7 @@ An endless runner browser game built with Phaser 3.
 
 ## How to Play
 
-**Play online:** [manuca17.github.io/Onda-Infinita](https://manuca17.github.io/Onda-Infinita/) — no install needed, just open the link in your browser.
+**Play online:** [manuca17.github.io/Onda-Infinita](https://manuca17.github.io/Onda-Infinita/) , no install needed, just open the link in your browser.
 
 Or run it locally with a local HTTP server (needed so the locale files load), e.g. inside the project root:
 
@@ -31,8 +31,7 @@ Click the language button on the menu to cycle through Portuguese, English, Span
 - [Phaser 3.80](https://phaser.io/) — game framework (CDN)
 - Web Audio API — synthesized sound effects
 - localStorage — best score, coins and settings persistence
-- Firebase Firestore — online leaderboard (optional, see below)
-- No build step required
+- Firebase Firestore — online leaderboard 
 
 ## Project Structure
 
@@ -54,8 +53,3 @@ Click the language button on the menu to cycle through Portuguese, English, Span
         └── ShopScene.js
 ```
 
-## Leaderboard setup (optional)
-
-The online leaderboard uses Firebase. Copy `src/config.example.js` to `src/config.js`
-and fill in your own Firebase web config. Without it the game runs normally and the
-leaderboard is simply disabled. `src/config.js` is gitignored so keys are never committed.
