@@ -3,8 +3,9 @@
 An endless runner browser game built with Phaser 3.
 
 ## How to Play
+**Play online:** [manuca17.github.io/Onda-Infinita](https://manuca17.github.io/Onda-Infinita/) , no install needed, just open the link in your browser.
 
-Open `surf-or-sink/index.html` via a local HTTP server (e.g. `python -m http.server 8765` inside `surf-or-sink/`).
+Or run it locally: Open `surf-or-sink/index.html` via a local HTTP server (e.g. `python -m http.server 8765` inside `surf-or-sink/`).
 
 - **↑ / W** — move up
 - **↓ / S** — move down
