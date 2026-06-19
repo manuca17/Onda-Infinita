@@ -38,12 +38,12 @@ Click the language button on the menu to cycle through Portuguese, English, Span
 ```
 .
 ├── index.html
-├── assets/                  # images & music
-├── locales/                 # pt / en / es / fr translations
+├── assets/                  
+├── locales/                
 └── src/
     ├── main.js
     ├── firebase.js
-    ├── config.example.js    # copy to config.js with your Firebase keys
+    ├── config.example.js   
     └── scenes/
         ├── BootScene.js
         ├── PreloadScene.js
