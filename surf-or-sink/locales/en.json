@@ -27,5 +27,16 @@
   "lb_title": "🏆 TOP 10",
   "lb_empty": "No scores yet!",
   "lb_loading": "Loading...",
-  "lb_close": "Close"
+  "lb_close": "Close",
+  "shop": "🏪 Shop",
+  "shop_close": "Close",
+  "shop_buy": "Buy",
+  "shop_active": "Active ✓",
+  "coins": "coins",
+  "shop_life_name": "Extra Life",
+  "shop_life_desc": "Start the run\nwith 4 lives",
+  "shop_shield_name": "Shield",
+  "shop_shield_desc": "5s invincibility\nat run start",
+  "shop_score_name": "x2 Score",
+  "shop_score_desc": "Double score\nfor the whole run"
 }
