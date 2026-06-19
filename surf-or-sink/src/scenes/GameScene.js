@@ -721,7 +721,7 @@ class GameScene extends Phaser.Scene {
 
         // ── Progressive difficulty: speed scales with score ────────────────────
         this.elapsedSec += delta / 1000;
-        this.obstacleSpeed = this.baseSpeed - Math.min(this.score * 0.5, 400);
+        this.obstacleSpeed = this.baseSpeed - 100 * Math.log(1 + this.score / 40);
 
         // ── Parallax scrolling (scaled by slow-mo and current speed) ───────────
         const s = this.slowFactor;
