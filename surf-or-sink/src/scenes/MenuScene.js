@@ -117,7 +117,9 @@ class MenuScene extends Phaser.Scene {
         this.langBtnBg.on('pointerover', () => this.langBtnBg.setFillStyle(0xddeeff));
         this.langBtnBg.on('pointerout', () => this.langBtnBg.setFillStyle(0xffffff));
         this.langBtnBg.on('pointerdown', () => {
-            window.currentLang = (window.currentLang === 'pt') ? 'en' : 'pt';
+            const cycle = ['pt', 'en', 'es', 'fr'];
+            const idx = cycle.indexOf(window.currentLang);
+            window.currentLang = cycle[(idx + 1) % cycle.length];
             this.refreshTexts();
         });
 
