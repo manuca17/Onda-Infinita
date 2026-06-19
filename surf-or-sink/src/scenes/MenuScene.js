@@ -67,12 +67,29 @@ class MenuScene extends Phaser.Scene {
         });
         this.playBtnBg.on('pointerdown', () => this.startGame());
 
+        // ── Shop button ────────────────────────────────────────────────────────
+        this.shopBtnBg = this.add.rectangle(W / 2 - 90, 372, 130, 30, 0x1a6fa8, 1)
+            .setStrokeStyle(2, 0x0d4a7a)
+            .setInteractive({ useHandCursor: true });
+
+        this.shopBtnText = this.add.text(W / 2 - 90, 372, window.t('shop'), {
+            fontSize: '14px', fontFamily: 'Arial Black, Arial', fontStyle: 'bold',
+            fill: '#ffffff', stroke: '#0a2a4a', strokeThickness: 2
+        }).setOrigin(0.5);
+
+        this.shopBtnBg.on('pointerover', () => this.shopBtnBg.setFillStyle(0x2280c0));
+        this.shopBtnBg.on('pointerout',  () => this.shopBtnBg.setFillStyle(0x1a6fa8));
+        this.shopBtnBg.on('pointerdown', () => {
+            this.cameras.main.fadeOut(300, 0, 0, 0);
+            this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('Shop'));
+        });
+
         // ── Leaderboard button ─────────────────────────────────────────────────
-        this.lbBtnBg = this.add.rectangle(W / 2, 372, 140, 30, 0xb8860b, 1)
+        this.lbBtnBg = this.add.rectangle(W / 2 + 80, 372, 140, 30, 0xb8860b, 1)
             .setStrokeStyle(2, 0x7a5800)
             .setInteractive({ useHandCursor: true });
 
-        this.lbBtnText = this.add.text(W / 2, 372, window.t('leaderboard'), {
+        this.lbBtnText = this.add.text(W / 2 + 80, 372, window.t('leaderboard'), {
             fontSize: '14px',
             fontFamily: 'Arial Black, Arial',
             fontStyle: 'bold',

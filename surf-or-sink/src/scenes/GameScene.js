@@ -31,6 +31,12 @@ class GameScene extends Phaser.Scene {
         // Day/night cycle & milestones
         this.milestones    = new Set();
 
+        // Shop boosts (consumed at run start)
+        this.scoreBoost = window.shopBoosts.doubleScore ? 2 : 1;
+        if (window.shopBoosts.extraLife)   { this.lives = 4; }
+        // shield & doubleScore consumed below after scene is set up
+
+
         // ── Parallax background layers (2 wave layers for depth) ───────────────
         this.skyLayer      = this.add.tileSprite(W / 2, H / 2, W, H, 'sky');
         this.oceanLayer    = this.add.tileSprite(W / 2, H / 2, W, H, 'ocean').setAlpha(0.85);
@@ -75,9 +81,11 @@ class GameScene extends Phaser.Scene {
         }).setScrollFactor(0).setDepth(20);
 
         this.hearts = [];
-        for (let i = 0; i < 3; i++) {
+        const maxHearts = this.lives; // 3 or 4 with boost
+        for (let i = 0; i < Math.max(maxHearts, 3); i++) {
             const heart = this.add.image(780 - i * 32, 20, 'heart')
                 .setScrollFactor(0).setDepth(20);
+            if (i >= this.lives) heart.setVisible(false);
             this.hearts.push(heart);
         }
 
@@ -161,8 +169,25 @@ class GameScene extends Phaser.Scene {
         // ── Camera fade in ─────────────────────────────────────────────────────
         this.cameras.main.fadeIn(400, 0, 0, 0);
 
+        // ── Coin HUD ───────────────────────────────────────────────────────────
+        this.coinHud = this.add.text(16, 70, '💰 ' + window.coins, {
+            fontSize: '15px', fontFamily: 'Arial', fill: '#ffd700',
+            stroke: '#003366', strokeThickness: 3
+        }).setScrollFactor(0).setDepth(20);
+
         this.bgMusic = this.sound.add('bgmusic', { loop: true, volume: window.musicVolume });
         this.bgMusic.play();
+
+        // ── Consume shop boosts ────────────────────────────────────────────────
+        if (window.shopBoosts.extraLife) {
+            window.shopBoosts.extraLife = false;
+            window.saveBoosts();
+        }
+        if (window.shopBoosts.doubleScore) {
+            window.shopBoosts.doubleScore = false;
+            window.saveBoosts();
+            this.floatLater = true; // show x2 label after countdown
+        }
 
         // ── Initial countdown before gameplay begins ───────────────────────────
         this.countingDown = true;
@@ -173,6 +198,17 @@ class GameScene extends Phaser.Scene {
 
     // ── Start spawners after countdown ─────────────────────────────────────────
     beginGame() {
+        // Apply shield boost now (after countdown)
+        if (window.shopBoosts.shield) {
+            window.shopBoosts.shield = false;
+            window.saveBoosts();
+            this.activateShield(5000);
+            this.floatText(window.t('pu_shield'), '#ffe44d');
+        }
+        if (this.floatLater) {
+            this.floatText('x2 ' + window.t('shop_score_name'), '#ff88ff');
+        }
+
         this.spawnEvent = this.time.addEvent({
             delay: Phaser.Math.Between(1500, 2500),
             loop: false,
@@ -637,10 +673,12 @@ class GameScene extends Phaser.Scene {
     collectCoin(surfer, coin) {
         if (this.gameEnded) return;
         coin.destroy();
-        const bonus = 15 * this.multiplier;
-        this.score += bonus;
+        const amount = Math.random() < 0.35 ? 30 : 15;
+        window.coins += amount;
+        window.saveCoins();
+        this.coinHud.setText('💰 ' + window.coins);
         this.splashParticles.emitParticleAt(surfer.x, surfer.y, 5);
-        this.floatText('+' + bonus, '#ffd700');
+        this.floatText('+' + amount + ' 💰', '#ffd700');
         window.playJumpSound && window.playJumpSound();
     }
 
@@ -783,8 +821,8 @@ class GameScene extends Phaser.Scene {
             }
         }
 
-        // ── Score increment (scaled by combo multiplier) ───────────────────────
-        this.score += (delta / 100) * this.multiplier;
+        // ── Score increment (scaled by combo multiplier and shop boost) ──────────
+        this.score += (delta / 100) * this.multiplier * this.scoreBoost;
         this.scoreText.setText(window.t('score') + ': ' + Math.floor(this.score));
 
         // ── Day/night & milestones ─────────────────────────────────────────────

@@ -1,6 +1,14 @@
 // Global music volume (persisted)
 window.musicVolume = parseFloat(localStorage.getItem('surforsink_volume') ?? '0.5');
 
+// Coin wallet (persisted)
+window.coins = parseInt(localStorage.getItem('surforsink_coins') || '0', 10);
+window.saveCoins = function() { localStorage.setItem('surforsink_coins', String(window.coins)); };
+
+// Shop boosts (single-use, consumed at run start)
+window.shopBoosts = JSON.parse(localStorage.getItem('surforsink_boosts') || '{}');
+window.saveBoosts = function() { localStorage.setItem('surforsink_boosts', JSON.stringify(window.shopBoosts)); };
+
 // Global language and translation system
 window.currentLang = 'pt';
 window.locales = {};
@@ -89,7 +97,7 @@ const config = {
             debug: false
         }
     },
-    scene: [BootScene, PreloadScene, MenuScene, GameScene, GameOverScene]
+    scene: [BootScene, PreloadScene, MenuScene, GameScene, GameOverScene, ShopScene]
 };
 
 const game = new Phaser.Game(config);

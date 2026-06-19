@@ -27,5 +27,16 @@
   "lb_title": "🏆 TOP 10",
   "lb_empty": "Sem pontuações ainda!",
   "lb_loading": "A carregar...",
-  "lb_close": "Fechar"
+  "lb_close": "Fechar",
+  "shop": "🏪 Loja",
+  "shop_close": "Fechar",
+  "shop_buy": "Comprar",
+  "shop_active": "Ativo ✓",
+  "coins": "moedas",
+  "shop_life_name": "Vida Extra",
+  "shop_life_desc": "Começa a run\ncom 4 vidas",
+  "shop_shield_name": "Escudo",
+  "shop_shield_desc": "5s de invencibilidade\nno início da run",
+  "shop_score_name": "x2 Pontos",
+  "shop_score_desc": "Pontuação dobrada\ndurante a run"
 }
