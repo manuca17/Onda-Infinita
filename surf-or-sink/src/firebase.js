@@ -1,4 +1,13 @@
 (function () {
+    // Without a config.js (e.g. on a public deploy where the Firebase keys are
+    // not committed) the leaderboard is simply disabled instead of crashing.
+    if (!window.firebaseConfig || !window.firebaseConfig.apiKey || window.firebaseConfig.apiKey === 'COLOCA_AQUI') {
+        console.warn('Firebase config em falta — leaderboard desativado.');
+        window.submitScore   = async function () { return false; };
+        window.getLeaderboard = async function () { return []; };
+        return;
+    }
+
     firebase.initializeApp(window.firebaseConfig);
     const db = firebase.firestore();
 
