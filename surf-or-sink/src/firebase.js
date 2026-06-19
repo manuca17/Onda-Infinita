@@ -1,14 +1,5 @@
 (function () {
-    const firebaseConfig = {
-        apiKey:            'AIzaSyBZ85bVM0QXn9C5QSAlCZtBCwmbo0rqUls',
-        authDomain:        'leaderboardjogo.firebaseapp.com',
-        projectId:         'leaderboardjogo',
-        storageBucket:     'leaderboardjogo.firebasestorage.app',
-        messagingSenderId: '493415887462',
-        appId:             '1:493415887462:web:d4a8158512ed21b4a573a7'
-    };
-
-    firebase.initializeApp(firebaseConfig);
+    firebase.initializeApp(window.firebaseConfig);
     const db = firebase.firestore();
 
     window.submitScore = async function (name, score) {
